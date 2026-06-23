@@ -1,4 +1,4 @@
-export const ListMovies = (req, res) => {
+  export const ListMovies = (req, res) => {
     res.send("Get all movies");
   }
 
