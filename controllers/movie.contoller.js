@@ -1,68 +1,91 @@
 import Movie from "../models/movie.model.js";
 
-  export const ListMovies = async(req, res) => {
+export const ListMovies = async (req, res) => {
+  try {
+    const movie = await Movie.find();
+    res.status(200).json(movie);
+  } catch (error) {
+    res.status(400).json({ message: error?.message });
+  }
+};
+
+export const MovieDetail = async (req, res) => {
+  try {
+    const movie = await Movie.findById(req?.params?.id);
+    res.status(201).json(movie);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const ListByType = async (req, res) => {
     try {
-        const movie = await Movie.find();
-        res.status(200).json(movie)
-        
-    } catch (error) {
-        res.status(400).json({message : error?.message})
-    }
-  }
-
-  export const MovieDetail = async(req,res) => {
-    try {
-        const movie = await Movie.findById(req?.params?.id)
-        res.status(201).json(movie)
-        
-    } catch (error) {
-        res.status(404).json({message : error.message})
-    }
-  }
-
-  export const AddMovie = async(req,res) => {
-
-    const newMovie = new Movie({
-        title : req.body.title,
-        desc : req.body.desc
-    })
-
-    try {        
-        const movie = await newMovie.save();
-        res.status(200).json(movie)
-
-    } catch (error) {
-        res.status(400).json({message : error?.message})
-    }
-    
-  }
+      const movies = await Movie.find({
+        type: req.params.type,
+      });
   
-  export const UpdateMovie = async(req,res) => {
-
-    try {
-        const movie = await Movie.findOneAndUpdate({_id : req?.params?.id}, {
-            title : req.body.title,
-            desc : req.body.desc
-        },
-        {
-            new : true
-        }
-    )
-        res.status(200).json(movie)
-        
-    } catch (error) {
-        res.status(400).json({message : error?.message})
-    }
-
-      
-  }
+      if (!movies.length) {
+        return res.status(404).json({
+          message: `${req.params.type} not found`
+        });
+      }
   
-  export const DeleteMovie = async(req,res) => {
-    try {
-        await Movie.deleteOne({_id:req?.params?.id});
-        res.status(200).json({message : "Movie Deleted"})
-        
+      res.status(200).json(movies);
     } catch (error) {
-        res.status(404).json({message : error?.message})
+      res.status(500).json({
+        message: error.message,
+      });
     }
+  };
+
+export const AddMovie = async (req, res) => {
+  try {
+    const existingMovie = await Movie.findOne({ title: req.body.title });
+    if (existingMovie) {
+      return res.status(409).json({ message: "Movie Already Exist" });
+    }
+
+    const movie = await Movie.create({
+      title: req.body.title,
+      desc: req.body.desc,
+      type: req.body.type,
+    });
+    res.status(200).json({
+      message:
+        req.body.type === "movie"
+          ? "Movie added successfully"
+          : "Series added successfully",
+    });
+  } catch (error) {
+    const validationMessage = Object.values(error.errors)[0].message;
+    res.status(400).json({ message: validationMessage });
   }
+};
+
+export const UpdateMovie = async (req, res) => {
+  try {
+    const movie = await Movie.findOneAndUpdate(
+      { _id: req?.params?.id },
+      {
+        title: req.body.title,
+        desc: req.body.desc,
+        type: req.body.type,
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json(movie);
+  } catch (error) {
+    res.status(400).json({ message: error?.message });
+  }
+};
+
+export const DeleteMovie = async (req, res) => {
+  try {
+    await Movie.deleteOne({ _id: req?.params?.id });
+    res.status(200).json({ message: "Movie Deleted" });
+  } catch (error) {
+    res.status(404).json({ message: error?.message });
+  }
+};
