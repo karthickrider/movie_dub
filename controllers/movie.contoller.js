@@ -19,24 +19,38 @@ export const MovieDetail = async (req, res) => {
 };
 
 export const ListByType = async (req, res) => {
-    try {
-      const movies = await Movie.find({
-        type: req.params.type,
-      });
-  
-      if (!movies.length) {
-        return res.status(404).json({
-          message: `${req.params.type} not found`
+  try {
+    const typeMap = {
+      movie: "movie",
+      movies: "movie",
+      film: "movie",
+      films: "movie",
+      series: "series",
+      tv: "series",
+      tvshow: "series",
+      tvshows: "series",
+    };
+    const type = typeMap[req?.params?.type.toLowerCase()];
+
+    if (!type) {
+      res
+        .status(400)
+        .json({
+          message:
+            "Invalid type. Please use movie, movies, series, film, films, tv, tvshow, tvshows",
         });
-      }
-  
-      res.status(200).json(movies);
-    } catch (error) {
-      res.status(500).json({
-        message: error.message,
-      });
     }
-  };
+    const data = await Movie.find({ type });
+    if (data.length === 0) {
+      res.json(404).json({ message: `No ${type} found` });
+    }
+    return res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 export const AddMovie = async (req, res) => {
   try {
