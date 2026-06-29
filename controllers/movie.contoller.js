@@ -89,6 +89,7 @@ export const UpdateMovie = async (req, res) => {
         title: req.body.title,
         desc: req.body.desc,
         type,
+        thumbnail : req.file.filename
       },
       {
         new: true,
