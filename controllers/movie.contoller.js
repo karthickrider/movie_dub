@@ -65,7 +65,7 @@ export const AddMovie = async (req, res) => {
       title: req.body.title,
       desc: req.body.desc,
       type,
-      thumbnail : req.file.filename
+      thumbnail: req.file.filename,
     });
     res.status(200).json({
       message: `${type === "movie" ? "Movie" : "Series"} added successfully.`,
@@ -89,7 +89,7 @@ export const UpdateMovie = async (req, res) => {
         title: req.body.title,
         desc: req.body.desc,
         type,
-        thumbnail : req.file.filename
+        thumbnail: req.file.filename,
       },
       {
         new: true,
@@ -99,13 +99,11 @@ export const UpdateMovie = async (req, res) => {
     if (!movie) {
       res.status(404).json({ message: `${type} not found.` });
     }
-    res
-      .status(200)
-      .json({
-        message: `${
-          type === "movie" ? "Movie" : "Seiries"
-        } updated successfully.`,
-      });
+    res.status(200).json({
+      message: `${
+        type === "movie" ? "Movie" : "Seiries"
+      } updated successfully.`,
+    });
   } catch (error) {
     res.status(400).json({ message: error?.message });
   }
