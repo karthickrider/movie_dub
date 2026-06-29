@@ -1,18 +1,21 @@
 import express from "express";
-import { AddMovie, DeleteMovie, ListMovies, UpdateMovie, MovieDetail, ListByType } from "../controllers/movie.contoller.js";
+import { AddMovie, DeleteMovie, ListMovies, UpdateMovie, MovieDetail, ListByType, DeleteAll } from "../controllers/movie.contoller.js";
+import { upload } from "../lib/multerComp.js";
 
 const router = express.Router();
 
 router.get("/", ListMovies);
 
-router.post('/', AddMovie)
+router.post('/', upload.single("thumbnail"), AddMovie)
 
-router.get("/:type",ListByType)
+router.get("/type/:type",ListByType)
 
-router.get('/:id', MovieDetail)
+router.get('/details/:id', MovieDetail)
 
 router.put('/:id', UpdateMovie)
 
 router.delete('/:id', DeleteMovie)
+
+router.delete('/',DeleteAll)
 
 export default router;
