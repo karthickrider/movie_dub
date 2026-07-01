@@ -47,6 +47,35 @@ export const ListByType = async (req, res) => {
   }
 };
 
+
+// Filter the movie based on the keyword
+
+export const SearchMovie = async(req,res) =>{
+  try {
+    const title = req.params;
+    if(! title){
+      res.status(400).json({message : "Search keyword is required"})
+    }
+    const data = await Movie.find({
+      $and : [
+        {
+          title : {
+            $regex : req.query.title || "",
+            $options : "i"
+          }
+        },
+        req.query.type ? { type : req.query.type.toLowerCase()} : {}
+      ]
+    })
+    if(data.length === 0){
+      res.status(404).json({message : "No related Movies or Series found"})
+    }
+    return res.status(200).json(data)
+  } catch (error) {
+    res.status(500).json({message : error?.message})
+  }
+}
+
 // Adding a new movie
 export const AddMovie = async (req, res) => {
   try {
@@ -130,3 +159,5 @@ export const DeleteAll = async (req, res) => {
     res.status(500).json({ message: error?.message });
   }
 };
+
+// if we wanna send file for response we can use the res.sendFile() method and if we wanna reidrect the user if they enter a wrong route name we can use the res.redirect( method)
